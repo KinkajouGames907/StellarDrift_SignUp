@@ -287,6 +287,13 @@
       -webkit-backdrop-filter: blur(12px);
       border-bottom: 1.5px solid var(--neon-cyan);
       transition: top 0.3s;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .tab-bar::-webkit-scrollbar {
+      display: none;
     }
     .tab-bar.bottom {
       top: unset;
@@ -295,6 +302,14 @@
       border-top: 1.5px solid var(--neon-cyan);
       box-shadow: 0 -2px 24px 0 var(--neon-cyan);
     }
+    .tab-bar-inner {
+      display: flex;
+      flex-direction: row;
+      width: max-content;
+      min-width: 100vw;
+      align-items: center;
+      position: relative;
+    }
     .tab-btn {
       background: none;
       border: none;
@@ -302,19 +317,38 @@
       font-family: 'Orbitron', 'Roboto', Arial, sans-serif;
       font-size: 1.1em;
       font-weight: 700;
-      margin: 0 12px;
-      padding: 10px 18px;
+      margin: 0 8px;
+      padding: 10px 14px;
       border-radius: 16px;
       cursor: pointer;
       transition: background 0.2s, color 0.2s, box-shadow 0.2s;
       box-shadow: 0 0 0 0 transparent;
       outline: none;
       position: relative;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     .tab-btn.active, .tab-btn:focus {
       background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
       color: #fff;
       box-shadow: 0 0 16px 0 var(--neon-cyan);
+    }
+    /* Gradient fade for scroll cue */
+    .tab-bar::before, .tab-bar::after {
+      content: '';
+      position: absolute;
+      top: 0; width: 32px; height: 100%;
+      z-index: 11;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .tab-bar::before {
+      left: 0;
+      background: linear-gradient(90deg, rgba(20,20,40,1) 70%, rgba(20,20,40,0));
+    }
+    .tab-bar::after {
+      right: 0;
+      background: linear-gradient(270deg, rgba(20,20,40,1) 70%, rgba(20,20,40,0));
     }
     /* Custom Cursor */
     .custom-cursor {
@@ -361,7 +395,8 @@
       .section-title { font-size: 1rem; }
       .logo { width: 60px; height: 60px; }
       .tab-bar { height: var(--tab-height); font-size: 0.9em; }
-      .tab-btn { font-size: 0.9em; padding: 8px 8px; margin: 0 4px; }
+      .tab-bar-inner { min-width: 100vw; }
+      .tab-btn { font-size: 0.85em; padding: 8px 8px; margin: 0 2px; }
       .custom-cursor { width: 32px; height: 32px; }
       .custom-cursor .cursor-ring { width: 32px; height: 32px; }
     }
@@ -375,12 +410,14 @@
   <div class="nebula-bg"></div>
   <canvas class="particles"></canvas>
   <nav class="tab-bar" id="tabBar">
-    <button class="tab-btn active" data-tab="hero" onclick="showTab('hero')">Home</button>
-    <button class="tab-btn" data-tab="about" onclick="showTab('about')">About</button>
-    <button class="tab-btn" data-tab="skills" onclick="showTab('skills')">No Skills Needed</button>
-    <button class="tab-btn" data-tab="hardware" onclick="showTab('hardware')">Hardware</button>
-    <button class="tab-btn" data-tab="contact" onclick="showTab('contact')">Contact</button>
-    <button class="tab-btn" data-tab="join" onclick="showTab('join')">Join</button>
+    <div class="tab-bar-inner">
+      <button class="tab-btn active" data-tab="hero" onclick="showTab('hero')">Home</button>
+      <button class="tab-btn" data-tab="about" onclick="showTab('about')">About</button>
+      <button class="tab-btn" data-tab="skills" onclick="showTab('skills')">No Skills Needed</button>
+      <button class="tab-btn" data-tab="hardware" onclick="showTab('hardware')">Hardware</button>
+      <button class="tab-btn" data-tab="contact" onclick="showTab('contact')">Contact</button>
+      <button class="tab-btn" data-tab="join" onclick="showTab('join')">Join</button>
+    </div>
   </nav>
   <div class="container">
     <!-- Hero Section -->
