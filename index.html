@@ -301,12 +301,13 @@
       border-bottom: none;
       border-top: 1.5px solid var(--neon-cyan);
       box-shadow: 0 -2px 24px 0 var(--neon-cyan);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      height: calc(var(--tab-height) + env(safe-area-inset-bottom, 0px));
     }
     .tab-bar-inner {
       display: flex;
       flex-direction: row;
       width: max-content;
-      min-width: 100vw;
       align-items: center;
       position: relative;
     }
@@ -395,14 +396,22 @@
       .section-title { font-size: 1rem; }
       .logo { width: 60px; height: 60px; }
       .tab-bar { height: var(--tab-height); font-size: 0.9em; }
-      .tab-bar-inner { min-width: 100vw; }
+      .tab-bar-inner { width: max-content; min-width: unset; }
       .tab-btn { font-size: 0.85em; padding: 8px 8px; margin: 0 2px; }
       .custom-cursor { width: 32px; height: 32px; }
       .custom-cursor .cursor-ring { width: 32px; height: 32px; }
     }
     @media (max-width: 600px) {
-      .tab-bar { top: unset; bottom: 0; border-bottom: none; border-top: 1.5px solid var(--neon-cyan); box-shadow: 0 -2px 24px 0 var(--neon-cyan); }
-      .container { padding-bottom: calc(var(--tab-height) + 10px); padding-top: 18px; }
+      .tab-bar, .tab-bar.bottom {
+        height: 44px;
+        min-height: 44px;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      .tab-btn {
+        font-size: 0.8em;
+        padding: 6px 6px;
+        min-width: 60px;
+      }
     }
   </style>
 </head>
