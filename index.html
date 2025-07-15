@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StellarDrift | Kinkajou-Game’s</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tsparticles/engine@3.0.0/tsparticles.engine.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <style>
+    :root {
+      --glass-bg: rgba(30, 30, 60, 0.6);
+      --glass-blur: 18px;
+      --neon-purple: #a259ff;
+      --neon-cyan: #00ffe7;
+      --neon-pink: #ff4ecd;
+      --text-main: #e0e0ff;
+      --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      --border-glow: 0 0 16px var(--neon-cyan), 0 0 32px var(--neon-purple);
+      --tab-height: 60px;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', Arial, sans-serif;
+      background: linear-gradient(135deg, #0a0020 0%, #1a0030 100%);
+      color: var(--text-main);
+      overflow-x: hidden;
+    }
+    body {
+      min-height: 100vh;
+      position: relative;
+    }
+    .nebula-bg {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 60% 40%, #a259ff55 0%, transparent 60%),
+                  radial-gradient(circle at 20% 70%, #00ffe755 0%, transparent 60%),
+                  radial-gradient(circle at 80% 80%, #ff4ecd55 0%, transparent 60%);
+      animation: nebulaMove 20s linear infinite alternate;
+    }
+    @keyframes nebulaMove {
+      0% { background-position: 60% 40%, 20% 70%, 80% 80%; }
+      100% { background-position: 65% 45%, 25% 75%, 75% 85%; }
+    }
+    .particles {
+      position: fixed;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .container {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px 80px 20px;
+      padding-top: calc(var(--tab-height) + 30px);
+    }
+    .glass {
+      background: var(--glass-bg);
+      box-shadow: var(--shadow);
+      border-radius: 24px;
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border: 1.5px solid rgba(255,255,255,0.12);
+      margin-bottom: 32px;
+      padding: 32px 28px;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.3s, border-color 0.3s;
+    }
+    .glass::before {
+      content: '';
+      position: absolute;
+      top: -40px; left: -40px; right: -40px; bottom: -40px;
+      background: linear-gradient(120deg, var(--neon-purple) 0%, var(--neon-cyan) 100%);
+      opacity: 0.08;
+      filter: blur(32px);
+      z-index: 0;
+      pointer-events: none;
+    }
+    h1, h2, h3 {
+      font-family: 'Orbitron', 'Roboto', Arial, sans-serif;
+      letter-spacing: 2px;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 12px var(--neon-purple), 0 0 24px var(--neon-cyan);
+    }
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5em;
+      animation: titleGlow 2.5s infinite alternate;
+    }
+    @keyframes titleGlow {
+      0% { text-shadow: 0 0 12px var(--neon-purple), 0 0 24px var(--neon-cyan); }
+      100% { text-shadow: 0 0 32px var(--neon-pink), 0 0 48px var(--neon-cyan); }
+    }
+    .logo {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 18px auto;
+      display: block;
+      filter: drop-shadow(0 0 24px var(--neon-cyan));
+      animation: logoSpin 8s linear infinite;
+    }
+    @keyframes logoSpin {
+      0% { transform: rotate(0deg) scale(1); }
+      100% { transform: rotate(360deg) scale(1.05); }
+    }
+    .subtitle {
+      font-size: 1.1rem;
+      color: var(--neon-pink);
+      margin-bottom: 1.2em;
+      text-shadow: 0 0 8px var(--neon-pink);
+      font-weight: 700;
+    }
+    .section-title {
+      font-size: 1.3rem;
+      margin-bottom: 0.6em;
+      color: var(--neon-purple);
+      text-shadow: 0 0 16px var(--neon-purple);
+    }
+    .about-list {
+      margin: 0 0 1em 0;
+      padding: 0 0 0 1.2em;
+      color: #b8eaff;
+    }
+    .compare {
+      color: var(--neon-cyan);
+      font-weight: 600;
+      margin-top: 0.5em;
+    }
+    .tool-panel {
+      background: rgba(40, 40, 70, 0.7);
+      border-radius: 16px;
+      margin: 12px 0;
+      padding: 16px 18px;
+      box-shadow: 0 0 16px 0 var(--neon-cyan);
+      border: 1.5px solid var(--neon-cyan);
+      position: relative;
+      transition: box-shadow 0.3s, border-color 0.3s;
+      cursor: pointer;
+    }
+    .tool-panel:hover, .tool-panel.active {
+      box-shadow: 0 0 32px 0 var(--neon-pink);
+      border-color: var(--neon-pink);
+    }
+    .tool-desc {
+      display: none;
+      margin-top: 10px;
+      color: #fff;
+      font-size: 1.15em;
+      font-weight: 500;
+      background: rgba(20,20,40,0.97);
+      border-radius: 14px;
+      padding: 18px 20px;
+      box-shadow: 0 0 24px 4px var(--neon-cyan), 0 0 48px 8px var(--neon-pink), 0 4px 32px 0 #000b;
+      border: 2px solid var(--neon-cyan);
+      position: absolute;
+      left: 0; right: 0;
+      z-index: 100;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      filter: blur(0.5px) saturate(1.2);
+      text-shadow: 0 2px 8px #000a;
+      pointer-events: auto;
+    }
+    .tool-panel.active .tool-desc {
+      display: block;
+      animation: fadeIn 0.5s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .hardware {
+      color: var(--neon-cyan);
+      font-weight: 600;
+      margin-bottom: 0.5em;
+    }
+    .contact-list {
+      color: var(--neon-pink);
+      font-size: 1.1em;
+      margin-bottom: 0.5em;
+    }
+    .meta-names {
+      color: var(--neon-cyan);
+      font-weight: 700;
+      margin-bottom: 0.5em;
+    }
+    .form-section {
+      margin-top: 2em;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-top: 1em;
+    }
+    label {
+      font-weight: 600;
+      color: var(--neon-purple);
+      margin-bottom: 4px;
+    }
+    input, select, textarea {
+      background: var(--glass-bg);
+      border: 1.5px solid var(--neon-cyan);
+      border-radius: 12px;
+      padding: 16px 18px;
+      color: #fff;
+      font-size: 1.1em;
+      box-shadow: 0 0 12px 0 var(--neon-cyan);
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      margin-bottom: 6px;
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--neon-pink);
+      box-shadow: 0 0 24px 0 var(--neon-pink);
+    }
+    button[type="submit"] {
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
+      color: #fff;
+      font-family: 'Orbitron', 'Roboto', Arial, sans-serif;
+      font-size: 1.3em;
+      font-weight: 700;
+      border: none;
+      border-radius: 16px;
+      padding: 16px 0;
+      margin-top: 10px;
+      box-shadow: 0 0 32px 0 var(--neon-cyan);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.3s, background 0.3s;
+      z-index: 1;
+    }
+    button[type="submit"]:hover {
+      box-shadow: 0 0 48px 0 var(--neon-pink);
+      background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan), var(--neon-purple));
+    }
+    .liquid {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      background: radial-gradient(circle at 60% 40%, #a259ff88 0%, transparent 60%),
+                  radial-gradient(circle at 20% 70%, #00ffe788 0%, transparent 60%),
+                  radial-gradient(circle at 80% 80%, #ff4ecd88 0%, transparent 60%);
+      filter: blur(18px);
+      opacity: 0.7;
+      animation: liquidMove 3s infinite alternate;
+    }
+    @keyframes liquidMove {
+      0% { background-position: 60% 40%, 20% 70%, 80% 80%; }
+      100% { background-position: 65% 45%, 25% 75%, 75% 85%; }
+    }
+    .footer {
+      text-align: center;
+      color: #aaa;
+      font-size: 1em;
+      margin-top: 40px;
+      padding-bottom: 24px;
+      opacity: 0.7;
+    }
+    /* Tab Bar */
+    .tab-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: var(--tab-height);
+      background: rgba(20, 20, 40, 0.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      box-shadow: 0 2px 24px 0 var(--neon-cyan);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1.5px solid var(--neon-cyan);
+      transition: top 0.3s;
+    }
+    .tab-bar.bottom {
+      top: unset;
+      bottom: 0;
+      border-bottom: none;
+      border-top: 1.5px solid var(--neon-cyan);
+      box-shadow: 0 -2px 24px 0 var(--neon-cyan);
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--neon-cyan);
+      font-family: 'Orbitron', 'Roboto', Arial, sans-serif;
+      font-size: 1.1em;
+      font-weight: 700;
+      margin: 0 12px;
+      padding: 10px 18px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 0 0 transparent;
+      outline: none;
+      position: relative;
+    }
+    .tab-btn.active, .tab-btn:focus {
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+      color: #fff;
+      box-shadow: 0 0 16px 0 var(--neon-cyan);
+    }
+    /* Custom Cursor */
+    .custom-cursor {
+      position: fixed;
+      left: 0; top: 0;
+      width: 44px; height: 44px;
+      pointer-events: none;
+      z-index: 10000;
+      mix-blend-mode: lighten;
+      transition: opacity 0.2s;
+      opacity: 1;
+    }
+    .custom-cursor .cursor-ring {
+      position: absolute;
+      left: 0; top: 0;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 2.5px solid var(--neon-cyan);
+      box-shadow: 0 0 24px 4px var(--neon-cyan), 0 0 48px 8px var(--neon-pink);
+      background: rgba(0,255,231,0.08);
+      filter: blur(0.5px);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .custom-cursor .cursor-dot {
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--neon-pink);
+      box-shadow: 0 0 12px 2px var(--neon-pink), 0 0 24px 4px var(--neon-cyan);
+      transform: translate(-50%, -50%);
+    }
+    /* Hide system cursor on desktop, but allow on mobile */
+    html.desktop, body.desktop, *:not(input):not(textarea):not(select).desktop {
+      cursor: none !important;
+    }
+    html.mobile, body.mobile, *:not(input):not(textarea):not(select).mobile {
+      cursor: auto !important;
+    }
+    @media (max-width: 700px) {
+      .container { padding: 18px 4px 60px 4px; padding-top: calc(var(--tab-height) + 10px); }
+      .glass { padding: 14px 6px; }
+      h1 { font-size: 1.2rem; }
+      .section-title { font-size: 1rem; }
+      .logo { width: 60px; height: 60px; }
+      .tab-bar { height: var(--tab-height); font-size: 0.9em; }
+      .tab-btn { font-size: 0.9em; padding: 8px 8px; margin: 0 4px; }
+      .custom-cursor { width: 32px; height: 32px; }
+      .custom-cursor .cursor-ring { width: 32px; height: 32px; }
+    }
+    @media (max-width: 600px) {
+      .tab-bar { top: unset; bottom: 0; border-bottom: none; border-top: 1.5px solid var(--neon-cyan); box-shadow: 0 -2px 24px 0 var(--neon-cyan); }
+      .container { padding-bottom: calc(var(--tab-height) + 10px); padding-top: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="nebula-bg"></div>
+  <canvas class="particles"></canvas>
+  <nav class="tab-bar" id="tabBar">
+    <button class="tab-btn active" data-tab="hero" onclick="showTab('hero')">Home</button>
+    <button class="tab-btn" data-tab="about" onclick="showTab('about')">About</button>
+    <button class="tab-btn" data-tab="skills" onclick="showTab('skills')">No Skills Needed</button>
+    <button class="tab-btn" data-tab="hardware" onclick="showTab('hardware')">Hardware</button>
+    <button class="tab-btn" data-tab="contact" onclick="showTab('contact')">Contact</button>
+    <button class="tab-btn" data-tab="join" onclick="showTab('join')">Join</button>
+  </nav>
+  <div class="container">
+    <!-- Hero Section -->
+    <div class="glass tab-content" id="tab-hero" style="text-align:center;">
+      <svg class="logo" viewBox="0 0 100 100">
+        <defs>
+          <radialGradient id="logoGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#fff"/>
+            <stop offset="60%" stop-color="#a259ff"/>
+            <stop offset="100%" stop-color="#00ffe7"/>
+          </radialGradient>
+        </defs>
+        <circle cx="50" cy="50" r="45" fill="url(#logoGrad)" filter="url(#glow)"/>
+        <ellipse cx="50" cy="50" rx="30" ry="12" fill="#fff2"/>
+        <ellipse cx="50" cy="40" rx="18" ry="7" fill="#fff5"/>
+        <path d="M50 15 Q60 50 50 85 Q40 50 50 15 Z" fill="#ff4ecd" opacity="0.7"/>
+      </svg>
+      <h1>StellarDrift: Explore Beyond Infinity</h1>
+      <div class="subtitle">Join the Kinkajou-Game’s dev community to help create the largest space game ever.</div>
+    </div>
+    <!-- About the Project -->
+    <div class="glass tab-content" id="tab-about" style="display:none;">
+      <div class="section-title">About the Project</div>
+      <ul class="about-list">
+        <li>StellarDrift is a Unity-based open-world space game where <b>anything anybody wants</b> can be made and added to the game—if it is appropriate for age 13+.</li>
+        <li>Community-driven content: you can create new worlds, ships, stories, features, and more.</li>
+        <li>Uses version control tools (like GitHub) and is powered by community developers.</li>
+      </ul>
+      <div class="compare">Inspired by Orion Drift, but bigger, more refined, and AI-supported. <br><b>There are no limits—if you can imagine it, you can add it!</b></div>
+    </div>
+    <!-- No Skills Needed -->
+    <div class="glass tab-content" id="tab-skills" style="display:none;">
+      <div class="section-title">No Skills Needed</div>
+      <div>NO programming, modeling, music, art, or game dev knowledge is required.</div>
+      <div style="margin-top:1em;">The game is powered by:</div>
+      <div class="tool-panel" onclick="togglePanel(this)">
+        <b>ChatGPT</b> <span style="color:var(--neon-cyan);">&#9432;</span>
+        <div class="tool-desc">ChatGPT helps generate scripts, systems, and logic for the game. Just describe what you want, and it will help create it!</div>
+      </div>
+      <div class="tool-panel" onclick="togglePanel(this)">
+        <b>Grok-4</b> <span style="color:var(--neon-cyan);">&#9432;</span>
+        <div class="tool-desc">Grok-4 can write code, generate ideas, music, and more. It’s like having a creative AI partner for every aspect of the game.</div>
+      </div>
+      <div class="tool-panel" onclick="togglePanel(this)">
+        <b>Cursor</b> <span style="color:var(--neon-cyan);">&#9432;</span>
+        <div class="tool-desc">Cursor is a powerful AI IDE. Just type a command like “Add a new enemy that shoots lasers,” and it will code it into the project. Then you test it!</div>
+      </div>
+    </div>
+    <!-- Hardware Recommendation -->
+    <div class="glass tab-content" id="tab-hardware" style="display:none;">
+      <div class="section-title">Hardware Recommendation</div>
+      <div class="hardware">We recommend having a PC for full game development.</div>
+      <div>If you're on mobile or no PC, you can still contribute music, art, story, and ideas using ChatGPT or Grok!</div>
+    </div>
+    <!-- Contact Info & Meta Quest -->
+    <div class="glass tab-content" id="tab-contact" style="display:none;">
+      <div class="section-title">Contact Info & Meta Quest</div>
+      <div class="contact-list">The ONLY project owners are:</div>
+      <div class="meta-names">SoraNeko<br>KittyGT-KittyGT</div>
+      <div style="color:var(--neon-pink);font-size:1.05em;margin-top:0.5em;">Add <b>exactly</b> one of these usernames on Meta Quest to contact the owner.</div>
+      <div>The game is being built in Unity, and team collaboration happens through cloud tools and version control.</div>
+    </div>
+    <!-- Join the Team (Signup Form) -->
+    <div class="glass form-section tab-content" id="tab-join" style="display:none;">
+      <div class="section-title">Join the Team</div>
+      <form id="signupForm" method="POST">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required />
+        <label for="meta">Meta Username</label>
+        <input type="text" id="meta" name="meta" required />
+        <label for="dev">Do you have any game dev knowledge?</label>
+        <select id="dev" name="dev" required>
+          <option value="No">No</option>
+          <option value="Yes">Yes</option>
+        </select>
+        <label for="ai">Will you use AI tools like ChatGPT, Grok, Cursor?</label>
+        <select id="ai" name="ai" required>
+          <option value="No">No</option>
+          <option value="Yes">Yes</option>
+          <option value="Both">Both</option>
+        </select>
+        <label for="contrib">What will you contribute? (Music, Code, Art, etc.)</label>
+        <input type="text" id="contrib" name="contrib" required />
+        <label for="age">Age</label>
+        <input type="number" id="age" name="age" min="10" max="120" required />
+        <button type="submit">
+          <span class="liquid"></span>
+          <span style="position:relative;z-index:2;">Submit</span>
+        </button>
+        <div id="form-success" style="display:none;color:var(--neon-cyan);margin-top:1em;font-weight:600;">Thank you! Your submission has been sent.</div>
+      </form>
+    </div>
+    <div class="footer">&copy; 2024 Kinkajou-Game’s. All rights reserved. | StellarDrift Project</div>
+  </div>
+  <div class="custom-cursor" id="customCursor">
+    <div class="cursor-ring"></div>
+    <div class="cursor-dot"></div>
+  </div>
+  <script>
+    // GSAP Animations
+    gsap.from('.logo', { scale: 0.7, opacity: 0, duration: 1.2, ease: 'elastic.out(1, 0.5)' });
+    gsap.from('h1', { y: -60, opacity: 0, duration: 1.2, delay: 0.3, ease: 'power3.out' });
+    gsap.from('.subtitle', { y: 30, opacity: 0, duration: 1, delay: 0.7 });
+    gsap.utils.toArray('.glass').forEach((el, i) => {
+      gsap.from(el, { y: 60, opacity: 0, duration: 1, delay: 0.5 + i * 0.2, ease: 'power2.out' });
+    });
+    // Parallax Nebula
+    document.addEventListener('mousemove', e => {
+      const x = e.clientX / window.innerWidth;
+      const y = e.clientY / window.innerHeight;
+      document.querySelector('.nebula-bg').style.backgroundPosition = `${60 + x*10}% ${40 + y*10}%, ${20 + x*10}% ${70 + y*10}%, ${80 - x*10}% ${80 - y*10}%`;
+    });
+    // Tooltips/Expandable Panels
+    function togglePanel(el) {
+      document.querySelectorAll('.tool-panel').forEach(p => { if (p !== el) p.classList.remove('active'); });
+      el.classList.toggle('active');
+      if (el.classList.contains('active')) {
+        gsap.fromTo(el.querySelector('.tool-desc'), {y: -20, opacity: 0, filter: 'blur(8px)'}, {y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.5, ease: 'power2.out'});
+      }
+    }
+    // Particle Effects (interactive stars)
+    const canvas = document.querySelector('.particles');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    let mouse = {x: -1000, y: -1000, down: false};
+    let isTouch = false;
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    function createStars() {
+      stars = [];
+      for (let i = 0; i < 120; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 1.5 + 0.5,
+          s: Math.random() * 0.5 + 0.2,
+          vx: 0,
+          vy: 0,
+          c: [
+            'rgba(162,89,255,0.8)',
+            'rgba(0,255,231,0.8)',
+            'rgba(255,78,205,0.8)',
+            'rgba(255,255,255,0.7)'
+          ][Math.floor(Math.random()*4)]
+        });
+      }
+    }
+    function drawStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const star of stars) {
+        // Interactivity: repel/attract to mouse/touch
+        let dx = star.x - mouse.x;
+        let dy = star.y - mouse.y;
+        let dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 120) {
+          let force = (isTouch ? 2.5 : 1.5) * (120 - dist) / 120;
+          let angle = Math.atan2(dy, dx);
+          if (mouse.down || isTouch) {
+            // Attract
+            star.vx -= Math.cos(angle) * force * 0.2;
+            star.vy -= Math.sin(angle) * force * 0.2;
+          } else {
+            // Repel
+            star.vx += Math.cos(angle) * force * 0.12;
+            star.vy += Math.sin(angle) * force * 0.12;
+          }
+        }
+        // Animate
+        star.x += star.s + star.vx;
+        star.y += star.vy;
+        star.vx *= 0.92;
+        star.vy *= 0.92;
+        // Wrap
+        if (star.x > canvas.width) star.x = 0;
+        if (star.x < 0) star.x = canvas.width;
+        if (star.y > canvas.height) star.y = 0;
+        if (star.y < 0) star.y = canvas.height;
+        // Draw
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.r, 0, 2 * Math.PI);
+        ctx.fillStyle = star.c;
+        ctx.shadowColor = star.c;
+        ctx.shadowBlur = 12;
+        ctx.fill();
+      }
+      requestAnimationFrame(drawStars);
+    }
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      createStars();
+    });
+    resizeCanvas();
+    createStars();
+    drawStars();
+    // Mouse/Touch Interactivity
+    canvas.addEventListener('mousemove', e => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      mouse.down = false;
+      isTouch = false;
+    });
+    canvas.addEventListener('mousedown', e => { mouse.down = true; });
+    canvas.addEventListener('mouseup', e => { mouse.down = false; });
+    canvas.addEventListener('mouseleave', e => { mouse.x = -1000; mouse.y = -1000; });
+    // Touch
+    canvas.addEventListener('touchstart', e => {
+      isTouch = true;
+      const t = e.touches[0];
+      mouse.x = t.clientX;
+      mouse.y = t.clientY;
+      mouse.down = true;
+    });
+    canvas.addEventListener('touchmove', e => {
+      isTouch = true;
+      const t = e.touches[0];
+      mouse.x = t.clientX;
+      mouse.y = t.clientY;
+      mouse.down = true;
+    });
+    canvas.addEventListener('touchend', e => {
+      mouse.down = false;
+      mouse.x = -1000;
+      mouse.y = -1000;
+      isTouch = false;
+    });
+    // Liquid Button Animation
+    gsap.to('.liquid', {
+      x: 20,
+      y: 10,
+      repeat: -1,
+      yoyo: true,
+      duration: 2.5,
+      ease: 'sine.inOut'
+    });
+    // Glass panel floating/pulse
+    // Interactive glass panel: glow/scale on hover/tap/proximity
+    gsap.utils.toArray('.glass').forEach((el, i) => {
+      el.addEventListener('mouseenter', () => {
+        gsap.to(el, { scale: 1.025, boxShadow: '0 0 48px 0 var(--neon-cyan)', duration: 0.3 });
+      });
+      el.addEventListener('mouseleave', () => {
+        gsap.to(el, { scale: 1, boxShadow: '0 0 32px 0 var(--neon-cyan)', duration: 0.3 });
+      });
+      el.addEventListener('mousedown', e => {
+        gsap.to(el, { scale: 0.98, boxShadow: '0 0 64px 0 var(--neon-pink)', duration: 0.15, yoyo: true, repeat: 1 });
+        // Ripple effect
+        let ripple = document.createElement('span');
+        ripple.style.position = 'absolute';
+        ripple.style.left = (e.clientX - el.getBoundingClientRect().left) + 'px';
+        ripple.style.top = (e.clientY - el.getBoundingClientRect().top) + 'px';
+        ripple.style.width = ripple.style.height = '0px';
+        ripple.style.borderRadius = '50%';
+        ripple.style.background = 'radial-gradient(circle, var(--neon-cyan) 0%, transparent 80%)';
+        ripple.style.pointerEvents = 'none';
+        ripple.style.zIndex = 100;
+        el.appendChild(ripple);
+        gsap.to(ripple, { width: '180px', height: '180px', opacity: 0, duration: 0.7, onComplete: () => ripple.remove() });
+      });
+      // Touch ripple
+      el.addEventListener('touchstart', e => {
+        const t = e.touches[0];
+        let ripple = document.createElement('span');
+        ripple.style.position = 'absolute';
+        ripple.style.left = (t.clientX - el.getBoundingClientRect().left) + 'px';
+        ripple.style.top = (t.clientY - el.getBoundingClientRect().top) + 'px';
+        ripple.style.width = ripple.style.height = '0px';
+        ripple.style.borderRadius = '50%';
+        ripple.style.background = 'radial-gradient(circle, var(--neon-pink) 0%, transparent 80%)';
+        ripple.style.pointerEvents = 'none';
+        ripple.style.zIndex = 100;
+        el.appendChild(ripple);
+        gsap.to(ripple, { width: '180px', height: '180px', opacity: 0, duration: 0.7, onComplete: () => ripple.remove() });
+      });
+    });
+    // Proximity effect: panels glow when cursor/touch is near
+    document.addEventListener('mousemove', e => {
+      document.querySelectorAll('.glass').forEach(el => {
+        const rect = el.getBoundingClientRect();
+        const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+        const dist = Math.sqrt((e.clientX-cx)**2 + (e.clientY-cy)**2);
+        if (dist < 180) {
+          gsap.to(el, { boxShadow: '0 0 64px 0 var(--neon-pink)', duration: 0.3 });
+        } else {
+          gsap.to(el, { boxShadow: '0 0 32px 0 var(--neon-cyan)', duration: 0.3 });
+        }
+      });
+    });
+    // Smooth persistent neon trail following cursor/touch
+    const TRAIL_LENGTH = 18;
+    const trailDots = [];
+    let trailTarget = { x: window.innerWidth/2, y: window.innerHeight/2 };
+    let isTouchTrail = false;
+    for (let i = 0; i < TRAIL_LENGTH; i++) {
+      let dot = document.createElement('div');
+      dot.style.position = 'fixed';
+      dot.style.width = dot.style.height = (18 - i) + 'px';
+      dot.style.borderRadius = '50%';
+      dot.style.pointerEvents = 'none';
+      dot.style.zIndex = 9999;
+      dot.style.opacity = (0.18 + 0.82 * (1 - i / TRAIL_LENGTH)).toFixed(2);
+      dot.style.background = `radial-gradient(circle, var(--neon-cyan) 0%, transparent 80%)`;
+      document.body.appendChild(dot);
+      trailDots.push({
+        el: dot,
+        x: trailTarget.x,
+        y: trailTarget.y
+      });
+    }
+    function updateTrailColor(color) {
+      for (let i = 0; i < TRAIL_LENGTH; i++) {
+        trailDots[i].el.style.background = `radial-gradient(circle, ${color} 0%, transparent 80%)`;
+      }
+    }
+    function moveTrail(x, y, color) {
+      trailTarget.x = x;
+      trailTarget.y = y;
+      updateTrailColor(color);
+    }
+    document.addEventListener('mousemove', e => {
+      isTouchTrail = false;
+      moveTrail(e.clientX, e.clientY, 'var(--neon-cyan)');
+    });
+    document.addEventListener('touchmove', e => {
+      isTouchTrail = true;
+      const t = e.touches[0];
+      moveTrail(t.clientX, t.clientY, 'var(--neon-pink)');
+    });
+    function animateTrail() {
+      let prev = trailTarget;
+      for (let i = 0; i < TRAIL_LENGTH; i++) {
+        let dot = trailDots[i];
+        // Interpolate toward previous point
+        dot.x += (prev.x - dot.x) * (0.32 + 0.12 * (1 - i / TRAIL_LENGTH));
+        dot.y += (prev.y - dot.y) * (0.32 + 0.12 * (1 - i / TRAIL_LENGTH));
+        dot.el.style.left = (dot.x - (18 - i)/2) + 'px';
+        dot.el.style.top = (dot.y - (18 - i)/2) + 'px';
+        dot.el.style.filter = `blur(${2 + i*0.7}px) drop-shadow(0 0 8px var(--neon-cyan))`;
+        prev = dot;
+      }
+      requestAnimationFrame(animateTrail);
+    }
+    animateTrail();
+    // Hero logo/title parallax/floating (mouse/touch)
+    const heroLogo = document.querySelector('.logo');
+    const heroTitle = document.querySelector('h1');
+    function heroMove(x, y) {
+      if (!heroLogo || !heroTitle) return;
+      const nx = (x / window.innerWidth - 0.5) * 30;
+      const ny = (y / window.innerHeight - 0.5) * 30;
+      gsap.to(heroLogo, { x: nx, y: ny, duration: 0.7, ease: 'sine.out' });
+      gsap.to(heroTitle, { x: nx/2, y: ny/2, duration: 0.7, ease: 'sine.out' });
+    }
+    document.addEventListener('mousemove', e => heroMove(e.clientX, e.clientY));
+    document.addEventListener('touchmove', e => {
+      const t = e.touches[0];
+      heroMove(t.clientX, t.clientY);
+    });
+    // Tab Bar and Tab Button Animations
+    gsap.utils.toArray('.tab-btn').forEach((btn, i) => {
+      btn.addEventListener('mouseenter', () => {
+        gsap.to(btn, { scale: 1.13, boxShadow: '0 0 24px var(--neon-pink)', duration: 0.3 });
+      });
+      btn.addEventListener('mouseleave', () => {
+        gsap.to(btn, { scale: 1, boxShadow: '0 0 0 0 transparent', duration: 0.3 });
+      });
+    });
+    // Tab Navigation with swipe/blur/fade animation
+    let currentTab = 'hero';
+    function showTab(tab) {
+      if (tab === currentTab) return;
+      const oldTab = document.getElementById('tab-' + currentTab);
+      const newTab = document.getElementById('tab-' + tab);
+      // Animate out old tab
+      gsap.to(oldTab, { x: -60 * (tab > currentTab ? 1 : -1), opacity: 0, filter: 'blur(16px)', duration: 0.45, ease: 'power2.in', onComplete: () => {
+        oldTab.style.display = 'none';
+        oldTab.style.transform = '';
+        oldTab.style.opacity = '';
+        oldTab.style.filter = '';
+        // Animate in new tab
+        newTab.style.display = '';
+        gsap.fromTo(newTab, { x: 60 * (tab > currentTab ? 1 : -1), opacity: 0, filter: 'blur(16px)' }, { x: 0, opacity: 1, filter: 'blur(0px)', duration: 0.55, ease: 'power2.out' });
+      }});
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector('.tab-btn[data-tab="' + tab + '"]').classList.add('active');
+      currentTab = tab;
+    }
+    // Mobile detection and tab bar position
+    function isMobile() {
+      return window.innerWidth <= 700 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    function adjustTabBar() {
+      const tabBar = document.getElementById('tabBar');
+      if (isMobile()) {
+        tabBar.classList.add('bottom');
+      } else {
+        tabBar.classList.remove('bottom');
+      }
+    }
+    window.addEventListener('resize', adjustTabBar);
+    adjustTabBar();
+    // Default to hero tab
+    showTab('hero');
+    // Extra: pulse/glow on submit button
+    gsap.to('button[type="submit"]', { boxShadow: '0 0 48px 0 var(--neon-pink)', repeat: -1, yoyo: true, duration: 2.2, ease: 'sine.inOut' });
+    // Extra: tool-panel hover/focus
+    gsap.utils.toArray('.tool-panel').forEach((el, i) => {
+      el.addEventListener('mouseenter', () => {
+        gsap.to(el, { scale: 1.04, boxShadow: '0 0 32px var(--neon-pink)', duration: 0.3 });
+      });
+      el.addEventListener('mouseleave', () => {
+        gsap.to(el, { scale: 1, boxShadow: '0 0 16px var(--neon-cyan)', duration: 0.3 });
+      });
+      el.addEventListener('mousedown', e => {
+        gsap.to(el, { scale: 0.97, boxShadow: '0 0 48px var(--neon-cyan)', duration: 0.15, yoyo: true, repeat: 1 });
+      });
+      el.addEventListener('touchstart', e => {
+        gsap.to(el, { scale: 0.97, boxShadow: '0 0 48px var(--neon-cyan)', duration: 0.15, yoyo: true, repeat: 1 });
+      });
+    });
+    // Custom Cursor Logic
+    const cursor = document.getElementById('customCursor');
+    const ring = cursor.querySelector('.cursor-ring');
+    const dot = cursor.querySelector('.cursor-dot');
+    let cursorTarget = { x: window.innerWidth/2, y: window.innerHeight/2 };
+    let cursorPos = { x: window.innerWidth/2, y: window.innerHeight/2 };
+    let cursorScale = 1;
+    let cursorVisible = true;
+    function moveCursor(x, y) {
+      cursorTarget.x = x;
+      cursorTarget.y = y;
+      cursor.style.opacity = 1;
+    }
+    document.addEventListener('mousemove', e => {
+      moveCursor(e.clientX, e.clientY);
+      cursorVisible = true;
+    });
+    document.addEventListener('mousedown', () => {
+      cursorScale = 1.5;
+      ring.style.borderColor = 'var(--neon-pink)';
+      ring.style.boxShadow = '0 0 32px 8px var(--neon-pink), 0 0 64px 16px var(--neon-cyan)';
+    });
+    document.addEventListener('mouseup', () => {
+      cursorScale = 1;
+      ring.style.borderColor = 'var(--neon-cyan)';
+      ring.style.boxShadow = '0 0 24px 4px var(--neon-cyan), 0 0 48px 8px var(--neon-pink)';
+    });
+    document.addEventListener('mouseleave', () => {
+      cursor.style.opacity = 0;
+      cursorVisible = false;
+    });
+    // Touch support: show cursor at finger
+    document.addEventListener('touchstart', e => {
+      const t = e.touches[0];
+      moveCursor(t.clientX, t.clientY);
+      cursorScale = 1.5;
+      cursor.style.opacity = 1;
+    });
+    document.addEventListener('touchmove', e => {
+      const t = e.touches[0];
+      moveCursor(t.clientX, t.clientY);
+      cursorScale = 1.5;
+      cursor.style.opacity = 1;
+    });
+    document.addEventListener('touchend', () => {
+      cursorScale = 1;
+      cursor.style.opacity = 0;
+    });
+    // Animate cursor
+    function animateCursor() {
+      cursorPos.x += (cursorTarget.x - cursorPos.x) * 0.32;
+      cursorPos.y += (cursorTarget.y - cursorPos.y) * 0.32;
+      cursor.style.left = (cursorPos.x - cursor.offsetWidth/2) + 'px';
+      cursor.style.top = (cursorPos.y - cursor.offsetHeight/2) + 'px';
+      cursor.style.transform = `scale(${cursorScale})`;
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+    // Detect mobile/touch and toggle custom cursor/system cursor
+    function isMobileDevice() {
+      return window.innerWidth <= 700 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    function updateCursorVisibility() {
+      const html = document.documentElement;
+      const body = document.body;
+      const customCursor = document.getElementById('customCursor');
+      if (isMobileDevice()) {
+        html.classList.remove('desktop');
+        html.classList.add('mobile');
+        body.classList.remove('desktop');
+        body.classList.add('mobile');
+        customCursor.style.display = 'none';
+      } else {
+        html.classList.remove('mobile');
+        html.classList.add('desktop');
+        body.classList.remove('mobile');
+        body.classList.add('desktop');
+        customCursor.style.display = '';
+      }
+    }
+    window.addEventListener('resize', updateCursorVisibility);
+    updateCursorVisibility();
+    // EmailJS integration
+    (function(){
+      emailjs.init('tiHH5rCj7GVG5wo8d'); // Your public key
+    })();
+    document.getElementById('signupForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var form = this;
+      // Replace these with your actual EmailJS service and template IDs
+      var serviceID = 'service_ej3lgnz';
+      var templateID = 'template_hrqwusu';
+      emailjs.sendForm(serviceID, templateID, form)
+        .then(function() {
+          form.reset();
+          document.getElementById('form-success').style.display = '';
+        }, function(error) {
+          alert('Failed to send form: ' + JSON.stringify(error));
+        });
+    });
+  </script>
+</body>
+</html> 
